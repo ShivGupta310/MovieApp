@@ -1,3 +1,4 @@
+import React from 'react'
 import {useState, useEffect} from 'react'
 import Search from './components/Search.jsx'
 
@@ -22,7 +23,15 @@ const App = () => {
 
     const fetchMovies = async () => {
         try{
+            const endpoint = `${API_BASE_DATA_URL}?s=Inception&apikey=${API_KEY}`;
+            const response = await fetch (endpoint, API_OPTIONS);
 
+            if(!response.ok){
+                throw new Error('Failed to fetch data');
+            }
+
+            const data = await response.json();
+            console.log(data);
         }
         catch(error){
             console.error(`Error fetching movies: ${error}`);
@@ -31,7 +40,7 @@ const App = () => {
     };
 
     useEffect(() => {
-
+        fetchMovies();
 
 
     },[searchTerm]);
@@ -44,10 +53,15 @@ const App = () => {
             <header>
                 <img src = "./hero.png" alt="Hero Banner" />
                 <h1> Find <span className="text-gradient">Movies</span> You'll Enjoy Without the Hassle</h1>
+                <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
             </header>
-
-            <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
+            <section className="all-movies ">
+                <h2>All Movies</h2>
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            </section>
         </div>
+
+        
     </main>
 
    )
