@@ -1,9 +1,40 @@
-import React from 'react'
+import {useState, useEffect} from 'react'
 import Search from './components/Search.jsx'
+
+const API_BASE_DATA_URL = 'http://www.omdbapi.com/';
+const API_BASE_POSTER_URL = 'http://img.omdbapi.com/';
+const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
+
+const API_OPTIONS = {
+    method: 'GET',
+    headers:{
+        accept: 'application/json',
+        Authorization: `Bearer ${API_KEY}`
+    }
+
+};
+
 
 const App = () => {
 
     const [searchTerm, setSearchTerm] = React.useState('');
+    const [errorMessage, setErrorMesaage] = React.useState('');
+
+    const fetchMovies = async () => {
+        try{
+
+        }
+        catch(error){
+            console.error(`Error fetching movies: ${error}`);
+            setErrorMesaage('Error fetching movies. Please try again later.');
+        }
+    };
+
+    useEffect(() => {
+
+
+
+    },[searchTerm]);
 
    return(
     <main>
