@@ -1,6 +1,7 @@
 import React from 'react'
 import {useState, useEffect} from 'react'
 import Search from './components/Search.jsx'
+import { createWebSocketModuleRunnerTransport } from 'vite/module-runner';
 
 const API_BASE_DATA_URL = 'http://www.omdbapi.com/';
 const API_BASE_POSTER_URL = 'http://img.omdbapi.com/';
@@ -17,7 +18,7 @@ const API_OPTIONS = {
 
 const App = () => {
 
-    const [searchTerm, setSearchTerm] = React.useState('Titanic');
+    const [searchTerm, setSearchTerm] = React.useState('');
     const [errorMessage, setErrorMesaage] = React.useState('');
     const [movieList, setMovieList] = useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -38,7 +39,12 @@ const App = () => {
             const data = await response.json();
             
             if (data.Response === 'False' ){
-                setErrorMesaage(data.Error || 'Error fetching movies. Please try again later.');
+                if (data.Error === 'Movie not found!'){
+                    setIsLoading(true);
+                    setErrorMesaage('');
+                } else{
+                    setErrorMesaage(data.Error || 'Error fetching movies. Please try again later.');
+                }
                 setMovieList([]);
                 return;
             }
@@ -53,7 +59,13 @@ const App = () => {
     };
 
     useEffect(() => {
-        fetchMovies();
+        if (searchTerm){
+            fetchMovies();
+        } else {
+            setMovieList([]);
+            setErrorMesaage('');
+        }
+        
     },[searchTerm]);
 
    return(
@@ -76,7 +88,7 @@ const App = () => {
                 ) : (
                     <ul className="movie-list">
                        {movieList.map((movie) => (
-                        <p className='text-white'>{movie.Title}</p>
+                        <p className='text-white' key = {movie.imdbID}>{movie.Title}</p>
                        ))}
                     </ul>
                 )}
