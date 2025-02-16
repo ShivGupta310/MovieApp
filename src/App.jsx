@@ -3,10 +3,9 @@ import {useState, useEffect} from 'react'
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx'
 import MovieNotFound from './components/NoResult.jsx'
-import { createWebSocketModuleRunnerTransport } from 'vite/module-runner';
+import MovieCard from './components/MovieCard.jsx'
 
 const API_BASE_DATA_URL = 'http://www.omdbapi.com/';
-const API_BASE_POSTER_URL = 'http://img.omdbapi.com/';
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 
 const API_OPTIONS = {
@@ -88,7 +87,7 @@ const App = () => {
                 <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
             </header>
             <section className="all-movies ">
-                <h2>All Movies</h2>
+                <h2 className='mt-[24px]'>All Movies</h2>
 
                 {isLoading ? (
                     <Spinner />
@@ -99,7 +98,7 @@ const App = () => {
                 ) : (
                     <ul className="movie-list">
                        {movieList.map((movie) => (
-                        <p className='text-white' key = {movie.imdbID}>{movie.Title}</p>
+                            <MovieCard key={moveBy.imdbID} movie={movie}/>
                        ))}
                     </ul>
                 )}
