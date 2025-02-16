@@ -1,6 +1,8 @@
 import React from 'react'
 import {useState, useEffect} from 'react'
 import Search from './components/Search.jsx'
+import Spinner from './components/Spinner.jsx'
+import MovieNotFound from './components/NoResult.jsx'
 import { createWebSocketModuleRunnerTransport } from 'vite/module-runner';
 
 const API_BASE_DATA_URL = 'http://www.omdbapi.com/';
@@ -22,10 +24,12 @@ const App = () => {
     const [errorMessage, setErrorMesaage] = React.useState('');
     const [movieList, setMovieList] = useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
+    const[noResult, setNoResult] = useState(false);
 
 
     const fetchMovies = async () => {
         setIsLoading(true);
+        setNoResult(false);
         setErrorMesaage('');
 
         try{
@@ -39,10 +43,14 @@ const App = () => {
             const data = await response.json();
             
             if (data.Response === 'False' ){
-                if (data.Error === 'Movie not found!'){
+                if (data.Error === 'Too many results.'){
                     setIsLoading(true);
                     setErrorMesaage('');
-                } else{
+                } 
+                if (data.Error === 'Movie not found!'){
+                    setNoResult(true);
+                    setErrorMesaage('');
+                }else{
                     setErrorMesaage(data.Error || 'Error fetching movies. Please try again later.');
                 }
                 setMovieList([]);
@@ -63,6 +71,7 @@ const App = () => {
             fetchMovies();
         } else {
             setMovieList([]);
+            setIsLoading(false);
             setErrorMesaage('');
         }
         
@@ -82,8 +91,10 @@ const App = () => {
                 <h2>All Movies</h2>
 
                 {isLoading ? (
-                    <p className='text-white'>Loading...</p>
-                ) : errorMessage ? (
+                    <Spinner />
+                ) :noResult ? (
+                    <MovieNotFound onRetry={() => setNoResult(false)} />
+                ): errorMessage ? (
                     <p className='text-red-500'>{errorMessage}</p>
                 ) : (
                     <ul className="movie-list">
