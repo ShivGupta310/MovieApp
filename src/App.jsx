@@ -10,7 +10,6 @@ const API_OPTIONS = {
     method: 'GET',
     headers:{
         accept: 'application/json',
-        Authorization: `Bearer ${API_KEY}`
     }
 
 };
@@ -18,31 +17,43 @@ const API_OPTIONS = {
 
 const App = () => {
 
-    const [searchTerm, setSearchTerm] = React.useState('');
+    const [searchTerm, setSearchTerm] = React.useState('Titanic');
     const [errorMessage, setErrorMesaage] = React.useState('');
+    const [movieList, setMovieList] = useState([]);
+    const [isLoading, setIsLoading] = React.useState(false);
+
 
     const fetchMovies = async () => {
+        setIsLoading(true);
+        setErrorMesaage('');
+
         try{
-            const endpoint = `${API_BASE_DATA_URL}?s=Inception&apikey=${API_KEY}`;
+            const endpoint = `${API_BASE_DATA_URL}?s=${searchTerm}&apikey=${API_KEY}`;
             const response = await fetch (endpoint, API_OPTIONS);
 
             if(!response.ok){
                 throw new Error('Failed to fetch data');
             }
-
+            console.log(response);
             const data = await response.json();
-            console.log(data);
-        }
-        catch(error){
+            
+            if (data.Response === 'False' ){
+                setErrorMesaage(data.Error || 'Error fetching movies. Please try again later.');
+                setMovieList([]);
+                return;
+            }
+
+            setMovieList(data.Search || []);
+        } catch(error){
             console.error(`Error fetching movies: ${error}`);
             setErrorMesaage('Error fetching movies. Please try again later.');
+        } finally{
+            setIsLoading(false);
         }
     };
 
     useEffect(() => {
         fetchMovies();
-
-
     },[searchTerm]);
 
    return(
@@ -57,7 +68,19 @@ const App = () => {
             </header>
             <section className="all-movies ">
                 <h2>All Movies</h2>
-                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+
+                {isLoading ? (
+                    <p className='text-white'>Loading...</p>
+                ) : errorMessage ? (
+                    <p className='text-red-500'>{errorMessage}</p>
+                ) : (
+                    <ul className="movie-list">
+                       {movieList.map((movie) => (
+                        <p className='text-white'>{movie.Title}</p>
+                       ))}
+                    </ul>
+                )}
+
             </section>
         </div>
 
